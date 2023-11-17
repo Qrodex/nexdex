@@ -1,0 +1,26 @@
+<style>
+    button,
+    textarea,
+    input {
+        width: calc(100% - 10px);
+        margin: 5px;
+        box-sizing: border-box;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+</style>
+
+<form action="http://localhost:3000/upload" method="post" enctype="multipart/form-data">
+    <input type="file" name="video" id="video" accept="video/*" required>
+    <br>
+    <input type="text" name="title" id="title" placeholder="title" required>
+    <br>
+    <textarea name="description" id="description" placeholder="description" rows="4"></textarea>
+    <br>
+    <button type="submit">Upload Video</button>
+</form>

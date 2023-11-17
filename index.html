@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[nexdex]</title>
+    <style>
+        body {
+            width: 800px;
+            margin: 0 auto;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        fieldset {
+            text-align: left;
+            width: fit-content;
+            display: inline-block;
+            width: 100%;
+        }
+
+        fieldset input,
+        fieldset textarea,
+        fieldset button {
+            width: calc(100% - 10px);
+            margin: 5px;
+            box-sizing: border-box;
+        }
+
+        video {
+            width: 140px;
+            float: left;
+            aspect-ratio: 16/9;
+        }
+
+        .video {
+            height: 78.75px;
+            margin: 10px;
+        }
+
+        .video span {
+            padding: 5px;
+        }
+
+        nav {
+            float: left;
+            width: 25%;
+        }
+
+        section {
+            float: right;
+            padding: 20px;
+            width: 75%;
+        }
+
+        iframe {
+            border: none;
+            width: 100%;
+            height: 157px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav>
+        <h1>[nexdex]</h1>
+        <code>the video sharing platform for everyone</code>
+
+        <br><br>
+
+        <fieldset>
+            <b>Upload</b>
+            <iframe src="submit"></iframe>
+        </fieldset>
+
+        <br><br>
+
+        <fieldset>
+            <span>
+                <b>News</b>
+                <br>
+                welcome to nexdex! now open for beta
+            </span>
+        </fieldset>
+
+        <br><br>
+
+        <fieldset>
+            <b>&copy; Qrodex 2023</b>
+        </fieldset>
+    </nav>
+
+    <section>
+        <fieldset>
+            <b>Videos</b>
+            <div id="videos"></div>
+        </fieldset>
+    </section>
+</body>
+<script async>
+    async function getVideos() {
+        let currenturl = window.location.origin
+        let get = await fetch(currenturl + '/fetch')
+        let data = await get.json()
+
+        data.data.forEach(function (element) {
+            let div = document.createElement('div')
+            div.className = 'video'
+            div.innerHTML = `
+            <video src="${'embed?v=' + element.id}"></video>
+            <span>${element.title}</span>
+            `
+
+            document.getElementById('videos').prepend(div)
+
+            div.onclick = function () {
+                window.location.href = currenturl + "/watch?v=" + element.id
+            }
+        });
+    }
+
+    getVideos()
+</script>
+
+</html>
