@@ -1,0 +1,55 @@
+body {
+    width: 800px;
+    margin: 0 auto;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+fieldset {
+    text-align: left;
+    width: fit-content;
+    display: inline-block;
+    width: 100%;
+    margin: 0;
+}
+
+fieldset input,
+fieldset textarea,
+fieldset button {
+    width: calc(100% - 10px);
+    margin: 5px;
+    box-sizing: border-box;
+}
+
+video {
+    width: 100%;
+    aspect-ratio: 16/9;
+}
+
+.video {
+    height: 78.75px;
+    margin: 10px;
+}
+
+.video span {
+    padding: 5px;
+}
+
+nav {
+    float: left;
+    width: 25%;
+}
+
+section {
+    float: right;
+    padding: 20px;
+    width: 75%;
+}
+
+iframe {
+    border: none;
+    width: 100%;
+    height: 157px;
+}

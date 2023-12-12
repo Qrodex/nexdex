@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[nexdex]</title>
+    <link rel="stylesheet" href="/css">
+</head>
+
+<body>
+    <nav>
+        <h1>[nexdex]</h1>
+        <code>the video sharing platform for everyone</code>
+
+        <br><br>
+
+        <fieldset>
+            <b id="title"></b><br>
+            <span id="desc"></span>
+        </fieldset>
+        <br><br>
+        <fieldset>
+            <b>Write a comment</b>
+            <br>
+            <input placeholder="Username" id="username">
+            <br>
+            <textarea placeholder="Comment" id="comment"></textarea>
+            <br>
+            <button onclick="CommentArea()">Comment</button>
+        </fieldset>
+        <br><br>
+    </nav>
+
+    <section>
+        <video id="video" controls autoplay></video>
+        <br><br>
+        <fieldset id="commentsdiv">
+            <b>Comments</b>
+            <br>
+        </fieldset>
+    </section>
+</body>
+<script async>
+    const Query = window.location.search;
+    const urlParams = new URLSearchParams(Query);
+    const videosrc = urlParams.get('v');
+
+    async function getVideos() {
+        document.getElementById('video').src = 'embed?v=' + videosrc
+
+        let currenturl = window.location.origin
+        let get = await fetch(currenturl + '/vmetadata?v=' + videosrc)
+        let data = await get.json()
+
+        document.getElementById('title').innerText = data.title
+        document.getElementById('desc').innerText = data.description
+    }
+
+    function comment(text, user) {
+        if (text !== undefined && user !== undefined) {
+            const url = '/comment?' + new URLSearchParams({
+                vidlink: videosrc,
+                text: text,
+                username: user
+            });
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+            return 'Comment sent!'
+        } else {
+            return 'Error!'
+        }
+    }
+
+    function CommentArea() {
+        let username = document.getElementById('username').value
+        let commenttext = document.getElementById('comment').value
+
+        document.getElementById('comment').value = ``
+        document.getElementById('username').value = ``
+
+        comment(commenttext, username)
+    }
+
+    getVideos()
+
+    async function getComments() {
+        let currenturl = window.location.origin
+        let get = await fetch(currenturl + '/comments?vidlink=' + videosrc)
+        let data = await get.json()
+        let commentsection = document.getElementById('commentsdiv')
+
+        if (data.data.length == 0) {
+            elem = document.createElement('span')
+            elem.innerText = 'No comments!'
+
+            commentsection.appendChild(elem)
+        }
+
+        data.data.forEach(function (element, i) {
+            boldelem = document.createElement('b')
+            boldelem.innerText = element.user
+
+            text = document.createElement('span')
+            text.innerText = element.text
+
+            elem = document.createElement('fieldset')
+            elem.appendChild(boldelem)
+            elem.appendChild(document.createElement('br'))
+            elem.appendChild(text)
+
+            commentsection.appendChild(elem)
+            console.log(i)
+
+            if (i + 1 != data.data.length) {
+                commentsection.appendChild(document.createElement('br'))
+                commentsection.appendChild(document.createElement('br'))
+            }
+        });
+    }
+
+    getComments()
+</script>
+
+</html>
