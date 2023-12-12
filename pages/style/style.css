@@ -15,6 +15,11 @@ fieldset {
     margin: 0;
 }
 
+#videos video {
+    width: 140px;
+    float: left;
+}
+
 fieldset input,
 fieldset textarea,
 fieldset button {
