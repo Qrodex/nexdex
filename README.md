@@ -12,7 +12,7 @@ Keep an eye out for these upcoming features that will soon be available on nexde
 - [x] Video viewer
 - [x] Upload video form
 - [x] Comments
-- [ ] Replies
+- [X] Replies
 - [ ] Reactions (Upvote, Downvote, Report)
 - [ ] Custom video player (Captions, Video quality)
 - [ ] Video search

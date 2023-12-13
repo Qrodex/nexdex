@@ -16,11 +16,11 @@
 </style>
 
 <form action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="video" id="video" accept="video/*" required>
+    <input type="file" name="video" id="video" accept="video/mp4" required>
     <br>
     <input type="text" name="title" id="title" placeholder="title" required>
     <br>
     <textarea name="description" id="description" placeholder="description" rows="4"></textarea>
     <br>
-    <button type="submit" onclick="this.innerText = 'Uploading Video...'">Upload Video</button>
+    <button type="submit" onclick="this.innerHTML = 'Uploading Video...'">Upload Video</button>
 </form>

@@ -3,6 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const url = require('url');
 const {makeid} = require('./idGenerator')
+const sanitizeHtml = require('sanitize-html')
 
 function handleUpload(app, __dirname) {
     const storage = multer.diskStorage({
@@ -24,8 +25,8 @@ function handleUpload(app, __dirname) {
         const uniqueFolder = req.file.destination.split(path.sep).pop();
 
         const metadata = {
-            title: req.body.title || 'Untitled',
-            description: req.body.description || '',
+            title: sanitizeHtml(req.body.title) || 'Untitled',
+            description: sanitizeHtml(req.body.description) || '',
             filename: req.file.originalname,
             path: `/uploads/${uniqueFolder}/${req.file.originalname}`,
         };

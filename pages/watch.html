@@ -33,13 +33,9 @@
         <br><br>
     </nav>
 
-    <section>
+    <section id="commentsdiv">
         <video id="video" controls autoplay></video>
         <br><br>
-        <fieldset id="commentsdiv">
-            <b>Comments</b>
-            <br>
-        </fieldset>
     </section>
 </body>
 <script async>
@@ -54,8 +50,8 @@
         let get = await fetch(currenturl + '/vmetadata?v=' + videosrc)
         let data = await get.json()
 
-        document.getElementById('title').innerText = data.title
-        document.getElementById('desc').innerText = data.description
+        document.getElementById('title').innerHTML = data.title
+        document.getElementById('desc').innerHTML = data.description
     }
 
     function comment(text, user) {
@@ -79,6 +75,29 @@
         }
     }
 
+    async function reply(text, user, commentid) {
+        if (text !== undefined && user !== undefined) {
+            const url = '/reply?' + new URLSearchParams({
+                vidlink: videosrc,
+                text: text,
+                username: user,
+                commentid: commentid
+            });
+
+            console.log(url)
+            await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+
+            return 'Reply sent!'
+        } else {
+            return 'Error!'
+        }
+    }
+
     function CommentArea() {
         let username = document.getElementById('username').value
         let commenttext = document.getElementById('comment').value
@@ -97,31 +116,76 @@
         let data = await get.json()
         let commentsection = document.getElementById('commentsdiv')
 
-        if (data.data.length == 0) {
-            elem = document.createElement('span')
-            elem.innerText = 'No comments!'
-
-            commentsection.appendChild(elem)
-        }
-
         data.data.forEach(function (element, i) {
-            boldelem = document.createElement('b')
-            boldelem.innerText = element.user
+            //the comment in question
+            let boldelem = document.createElement('b')
+            boldelem.innerHTML = element.user
 
-            text = document.createElement('span')
-            text.innerText = element.text
+            let text = document.createElement('span')
+            text.innerHTML = element.text
 
-            elem = document.createElement('fieldset')
+            let elem = document.createElement('fieldset')
             elem.appendChild(boldelem)
             elem.appendChild(document.createElement('br'))
             elem.appendChild(text)
 
             commentsection.appendChild(elem)
-            console.log(i)
 
             if (i + 1 != data.data.length) {
                 commentsection.appendChild(document.createElement('br'))
                 commentsection.appendChild(document.createElement('br'))
+            }
+
+            //the reply in question
+            let replyelem = document.createElement('details')
+            replyelem.innerHTML = `<summary>Replies</summary>`
+            elem.appendChild(replyelem)
+
+            let replysection = document.createElement('fieldset')
+            replyelem.appendChild(replysection)
+            if (element.replies && element.replies.length != 0) {
+                replyelem.appendChild(document.createElement('br'))
+                replyelem.appendChild(document.createElement('br'))
+            }
+
+            let usernameinput = document.createElement('input')
+            usernameinput.placeholder = 'Username'
+            replysection.appendChild(usernameinput)
+
+            let commentinput = document.createElement('textarea')
+            commentinput.placeholder = 'Reply'
+            replysection.appendChild(commentinput)
+
+            let commentbutton = document.createElement('button')
+            commentbutton.innerHTML = 'Reply'
+            replysection.appendChild(commentbutton)
+
+            commentbutton.onclick = function () {
+                reply(commentinput.value, usernameinput.value, element.id)
+                commentinput.value = ''
+                usernameinput.value = ''
+                commentbutton.innerHTML = 'Reply sent!'
+            }
+
+            if (element.replies) {
+                element.replies.forEach(function (elem, i) {
+                    let replyfieldset = document.createElement('fieldset')
+                    replyelem.appendChild(replyfieldset)
+
+                    if (element.replies.length != i + 1) {
+                        replyelem.appendChild(document.createElement('br'))
+                        replyelem.appendChild(document.createElement('br'))
+                    }
+
+                    let boldelemreply = document.createElement('b')
+                    boldelemreply.innerHTML = elem.user
+                    replyfieldset.appendChild(boldelemreply)
+                    replyfieldset.appendChild(document.createElement('br'))
+
+                    let textreply = document.createElement('span')
+                    textreply.innerHTML = elem.text
+                    replyfieldset.appendChild(textreply)
+                })
             }
         });
     }

@@ -2,25 +2,56 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
-const {makeid} = require('./idGenerator')
+const { makeid } = require('./idGenerator')
+const sanitizeHtml = require('sanitize-html')
 
 function commentHandler(app, __dirname) {
     app.get('/comment', (req, res) => {
         try {
             const uniqueVideoID = req.query.vidlink;
-            const theComment = req.query.text;
-            const theWriter = req.query.username;
+            const theComment = sanitizeHtml(req.query.text);
+            const theWriter = sanitizeHtml(req.query.username);
             const uniqueCommentID = makeid(16)
 
             const metadata = {
                 user: theWriter,
                 text: theComment,
+                replies: []
             };
 
             const metadataPath = path.join(__dirname, 'uploads', uniqueVideoID, 'comment', `${uniqueCommentID}.json`);
             fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
 
             res.json({ message: 'Comment sent successfully!' });
+        } catch (error) {
+            console.error(error)
+            res.json({ message: 'Internal Server Error' });
+        }
+    });
+
+    app.get('/reply', (req, res) => {
+        try {
+            const uniqueVideoID = req.query.vidlink;
+            const uniqueCommentID = req.query.commentid;
+            const theComment = sanitizeHtml(req.query.text);
+            const theWriter = sanitizeHtml(req.query.username);
+
+            const metadata = {
+                user: theWriter,
+                text: theComment
+            };
+
+            const commentFilePath = path.join(__dirname, 'uploads', uniqueVideoID, 'comment', `${uniqueCommentID}`);
+            fs.readFile((commentFilePath), (err, data) => {
+                const commentData = JSON.parse(data);
+                if (!commentData.replies) {
+                    commentData.replies = []
+                }
+                commentData.replies.push(metadata);
+                fs.writeFileSync(commentFilePath, JSON.stringify(commentData, null, 2));
+
+                res.json({ message: 'Reply sent successfully!' });
+            })
         } catch (error) {
             console.error(error)
             res.json({ message: 'Internal Server Error' });
