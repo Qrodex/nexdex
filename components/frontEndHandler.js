@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
-const {makeid} = require('./idGenerator')
+const { makeid, checkForEmptyString } = require('./idGenerator')
 
 function frontEndHandler(app, __dirname) {
     app.get('/', (req, res) => {
@@ -18,10 +18,15 @@ function frontEndHandler(app, __dirname) {
             const files = await fs.readdir("uploads");
             const total = [];
             const promises = files.map(async (id) => {
-                const data = await fs.readFile(__dirname + "/uploads/" + id + "/metadata.json");
-                const parsedData = JSON.parse(data);
-                parsedData.id = id;
-                total.push(parsedData);
+                try {
+                    const data = await fs.readFile(__dirname + "/uploads/" + id + "/metadata.json");
+                    const parsedData = JSON.parse(data);
+                    parsedData.id = id;
+                    total.push(parsedData);
+                } catch (error) {
+                    console.error('Corrupted video! Deleting...')
+                    fs.rm(__dirname + "/uploads/" + id, { recursive: true, force: true })
+                }
             });
 
             await Promise.all(promises);
@@ -111,4 +116,4 @@ function frontEndHandler(app, __dirname) {
     });
 }
 
-module.exports = {frontEndHandler}
+module.exports = { frontEndHandler }

@@ -21,6 +21,14 @@
             <span id="desc"></span>
         </fieldset>
         <br><br>
+        <fieldset class="votefieldset">
+            <b>Vote</b>
+            <br>
+            <button onclick="downvote()"><</button>
+            <button id="upvotespan">0</button>
+            <button onclick="upvote()">></button>
+        </fieldset>
+        <br><br>
         <fieldset>
             <b>Write a comment</b>
             <br>
@@ -42,6 +50,8 @@
     const Query = window.location.search;
     const urlParams = new URLSearchParams(Query);
     const videosrc = urlParams.get('v');
+    let videometadata
+    let voted = false
 
     async function getVideos() {
         document.getElementById('video').src = 'embed?v=' + videosrc
@@ -52,6 +62,9 @@
 
         document.getElementById('title').innerHTML = data.title
         document.getElementById('desc').innerHTML = data.description
+        document.getElementById('upvotespan').innerText = data.votes || 0
+
+        videometadata = data
     }
 
     function comment(text, user) {
@@ -75,6 +88,50 @@
         }
     }
 
+    function upvote() {
+        if (voted) return;
+        voted = true
+
+        const url = '/vote?' + new URLSearchParams({
+            vidlink: videosrc,
+            vote: 'up'
+        });
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+
+        if (!videometadata.votes) {
+            videometadata.votes = 0
+        }
+        document.getElementById('upvotespan').innerText = videometadata.votes + 1
+    }
+
+    function downvote() {
+        if (voted) return;
+        voted = true
+        
+        const url = '/vote?' + new URLSearchParams({
+            vidlink: videosrc,
+            vote: 'down'
+        });
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+
+        if (!videometadata.votes) {
+            videometadata.votes = 0
+        }
+        document.getElementById('upvotespan').innerText = videometadata.votes - 1
+    }
+
     async function reply(text, user, commentid) {
         if (text !== undefined && user !== undefined) {
             const url = '/reply?' + new URLSearchParams({
@@ -84,7 +141,6 @@
                 commentid: commentid
             });
 
-            console.log(url)
             await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -164,7 +220,6 @@
                 reply(commentinput.value, usernameinput.value, element.id)
                 commentinput.value = ''
                 usernameinput.value = ''
-                commentbutton.innerHTML = 'Reply sent!'
             }
 
             if (element.replies) {

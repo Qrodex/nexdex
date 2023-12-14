@@ -2,16 +2,21 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
-const { makeid } = require('./idGenerator')
+const { makeid, checkForEmptyString } = require('./idGenerator')
 const sanitizeHtml = require('sanitize-html')
 
 function commentHandler(app, __dirname) {
     app.get('/comment', (req, res) => {
         try {
             const uniqueVideoID = req.query.vidlink;
-            const theComment = sanitizeHtml(req.query.text);
-            const theWriter = sanitizeHtml(req.query.username);
+            let theComment = sanitizeHtml(req.query.text);
+            let theWriter = sanitizeHtml(req.query.username);
             const uniqueCommentID = makeid(16)
+
+            if (checkForEmptyString(theComment)) return;
+            if (checkForEmptyString(theWriter)) {
+                theWriter = 'Anonymous'
+            }
 
             const metadata = {
                 user: theWriter,
@@ -34,7 +39,12 @@ function commentHandler(app, __dirname) {
             const uniqueVideoID = req.query.vidlink;
             const uniqueCommentID = req.query.commentid;
             const theComment = sanitizeHtml(req.query.text);
-            const theWriter = sanitizeHtml(req.query.username);
+            let theWriter = sanitizeHtml(req.query.username);
+
+            if (checkForEmptyString(theComment)) return;
+            if (checkForEmptyString(theWriter)) {
+                theWriter = 'Anonymous'
+            }
 
             const metadata = {
                 user: theWriter,

@@ -2,7 +2,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const url = require('url');
-const {makeid} = require('./idGenerator')
+const {makeid,checkForEmptyString} = require('./idGenerator')
 const sanitizeHtml = require('sanitize-html')
 
 function handleUpload(app, __dirname) {
@@ -23,10 +23,18 @@ function handleUpload(app, __dirname) {
 
     app.post('/upload', upload.single('video'), (req, res) => {
         const uniqueFolder = req.file.destination.split(path.sep).pop();
+        let videoTitle = req.body.title
+        let videoDescription = req.body.description
+
+        if (checkForEmptyString(videoTitle)) {
+            videoTitle = 'Untitled'
+        } if (checkForEmptyString(videoDescription)) {
+            videoDescription = ''
+        }
 
         const metadata = {
-            title: sanitizeHtml(req.body.title) || 'Untitled',
-            description: sanitizeHtml(req.body.description) || '',
+            title: sanitizeHtml(videoTitle),
+            description: sanitizeHtml(videoDescription),
             filename: req.file.originalname,
             path: `/uploads/${uniqueFolder}/${req.file.originalname}`,
         };

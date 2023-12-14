@@ -10,4 +10,12 @@ function makeid(length) {
     return result;
 }
 
-module.exports = { makeid };
+function checkForEmptyString(string) {
+    if (!string.replace(/\s/g, '').length) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+module.exports = { makeid, checkForEmptyString };
